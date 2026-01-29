@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Customer Lookup</title>
+  <style>
+    body { font-family: Arial; padding: 20px }
+    input { padding: 8px; width: 220px }
+    button { padding: 8px }
+    .card { border: 1px solid #ddd; padding: 12px; margin-top: 10px }
+  </style>
+</head>
+<body>
+
+<h2>Customer Search</h2>
+
+<input id="mobile" placeholder="Enter mobile number" />
+<button onclick="search()">Search</button>
+
+<div id="result"></div>
+
+<script>
+async function search() {
+  const mobile = document.getElementById("mobile").value
+  const res = await fetch(
+    `https://wandering-bonus-9424.ashishrohra-ttb.workers.dev/?mobile=${mobile}`
+  )
+
+  const data = await res.json()
+  render(data)
+}
+
+function render(data) {
+  const el = document.getElementById("result")
+  el.innerHTML = ""
+
+  if (data.error) {
+    el.innerHTML = `<p>${data.error}</p>`
+    return
+  }
+
+  el.innerHTML += `
+    <div class="card">
+      <h3>${data.first_name}</h3>
+      <p>Mobile: ${data.mobile_number}</p>
+      <p>Gender: ${data.gender}</p>
+      <p>DOB: ${data.dob}</p>
+    </div>
+  `
+
+  if (data.customer_relations?.length) {
+    el.innerHTML += `<h4>Members</h4>`
+    data.customer_relations.forEach(m => {
+      el.innerHTML += `
+        <div class="card">
+          ${m.name} (${m.relationship})<br/>
+          ${m.gender}, Age ${m.age}
+        </div>
+      `
+    })
+  }
+
+  if (data.customer_addresses?.length) {
+    el.innerHTML += `<h4>Saved Addresses</h4>`
+    data.customer_addresses.forEach(a => {
+      el.innerHTML += `
+        <div class="card">
+          <b>${a.label}</b><br/>
+          ${a.autofill_location}
+        </div>
+      `
+    })
+  }
+}
+</script>
+
+</body>
+</html>
