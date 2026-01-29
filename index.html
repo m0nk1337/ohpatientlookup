@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Customer Lookup | Orange Health</title>
+  <title>Customer Lookup</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
@@ -24,73 +24,59 @@
       margin: 0;
       background: var(--bg);
       color: var(--text);
+      padding: 32px 16px;
     }
 
-    header {
-      background: white;
-      padding: 16px 24px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    header h1 {
-      font-size: 20px;
-      font-weight: 600;
-      color: var(--primary);
-      margin: 0;
-    }
-
-    main {
+    .container {
       max-width: 900px;
-      margin: 40px auto;
-      padding: 0 16px;
+      margin: auto;
     }
 
-    .search-box {
+    h2 {
+      margin-bottom: 20px;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .search-bar {
       background: var(--card);
+      padding: 20px;
       border-radius: 14px;
-      padding: 24px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.04);
       display: flex;
       gap: 12px;
+      margin-bottom: 24px;
     }
 
-    .search-box input {
+    input {
       flex: 1;
       padding: 14px 16px;
-      font-size: 16px;
+      font-size: 15px;
       border-radius: 10px;
       border: 1px solid var(--border);
       outline: none;
     }
 
-    .search-box input:focus {
+    input:focus {
       border-color: var(--primary);
     }
 
-    .search-box button {
+    button {
+      padding: 14px 22px;
+      font-size: 14px;
+      border-radius: 10px;
+      border: none;
       background: var(--primary);
       color: white;
-      border: none;
-      border-radius: 10px;
-      padding: 14px 22px;
-      font-size: 15px;
       cursor: pointer;
     }
 
-    .search-box button:hover {
+    button:hover {
       opacity: 0.9;
     }
 
-    .section {
-      margin-top: 28px;
-    }
-
-    .section h3 {
-      font-size: 16px;
-      margin-bottom: 12px;
+    h4 {
+      margin: 28px 0 12px;
       color: var(--muted);
       font-weight: 600;
     }
@@ -103,43 +89,34 @@
       margin-bottom: 12px;
     }
 
-    .row {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
     }
 
-    .label {
-      font-size: 13px;
+    .meta {
+      font-size: 14px;
       color: var(--muted);
-    }
-
-    .value {
-      font-size: 15px;
-      font-weight: 500;
+      margin-bottom: 4px;
     }
 
     .pill {
+      display: inline-block;
       background: #fff3e8;
       color: var(--primary);
       padding: 4px 10px;
       border-radius: 999px;
       font-size: 12px;
       font-weight: 600;
-    }
-
-    .loading {
-      margin-top: 24px;
-      color: var(--muted);
+      margin-top: 6px;
     }
 
     @media (max-width: 600px) {
-      .search-box {
+      .search-bar {
         flex-direction: column;
       }
 
-      .search-box button {
+      button {
         width: 100%;
       }
     }
@@ -148,110 +125,68 @@
 
 <body>
 
-<header>
-  <h1>Orange Health — Customer Lookup</h1>
-</header>
+<div class="container">
 
-<main>
+  <h2>Customer Search</h2>
 
-  <div class="search-box">
+  <div class="search-bar">
     <input id="mobile" placeholder="Enter mobile number" />
     <button onclick="search()">Search</button>
   </div>
 
-  <div id="status" class="loading"></div>
   <div id="result"></div>
 
-</main>
+</div>
 
 <script>
-const WORKER_URL ="https://wandering-bonus-9424.ashishrohra-ttb.workers.dev/"
-
 async function search() {
-  const mobile = document.getElementById("mobile").value.trim()
-  const status = document.getElementById("status")
-  const result = document.getElementById("result")
+  const mobile = document.getElementById("mobile").value
+  const res = await fetch(
+    `https://wandering-bonus-9424.ashishrohra-ttb.workers.dev/?mobile=${mobile}`
+  )
 
-  result.innerHTML = ""
-  status.textContent = "Searching customer…"
-
-  if (!mobile) {
-    status.textContent = "Please enter a mobile number"
-    return
-  }
-
-  try {
-    const res = await fetch(`${WORKER_URL}/?mobile=${mobile}`)
-    const data = await res.json()
-
-    status.textContent = ""
-
-    if (data.error) {
-      status.textContent = data.error
-      return
-    }
-
-    render(data)
-  } catch (e) {
-    status.textContent = "Something went wrong"
-  }
+  const data = await res.json()
+  render(data)
 }
 
 function render(data) {
   const el = document.getElementById("result")
+  el.innerHTML = ""
+
+  if (data.error) {
+    el.innerHTML = `<p>${data.error}</p>`
+    return
+  }
 
   el.innerHTML += `
-    <div class="section">
-      <h3>Primary Customer</h3>
-      <div class="card">
-        <div class="row">
-          <div>
-            <div class="label">Name</div>
-            <div class="value">${data.first_name}</div>
-          </div>
-          <span class="pill">${data.gender}</span>
-        </div>
-        <div class="row" style="margin-top:12px">
-          <div>
-            <div class="label">Mobile</div>
-            <div class="value">${data.mobile_number}</div>
-          </div>
-          <div>
-            <div class="label">DOB</div>
-            <div class="value">${data.dob}</div>
-          </div>
-        </div>
-      </div>
+    <div class="card">
+      <h3>${data.first_name}</h3>
+      <div class="meta">Mobile: ${data.mobile_number}</div>
+      <div class="meta">DOB: ${data.dob}</div>
+      <span class="pill">${data.gender}</span>
     </div>
   `
 
   if (data.customer_relations?.length) {
-    el.innerHTML += `<div class="section"><h3>Members</h3></div>`
+    el.innerHTML += `<h4>Members</h4>`
     data.customer_relations.forEach(m => {
       el.innerHTML += `
         <div class="card">
-          <div class="row">
-            <div class="value">${m.name}</div>
-            <span class="pill">${m.relationship}</span>
-          </div>
-          <div class="row" style="margin-top:10px">
-            <div class="label">${m.gender} · ${m.age} yrs</div>
-          </div>
+          <strong>${m.name}</strong>
+          <div class="meta">${m.gender} · Age ${m.age}</div>
+          <span class="pill">${m.relationship}</span>
         </div>
       `
     })
   }
 
   if (data.customer_addresses?.length) {
-    el.innerHTML += `<div class="section"><h3>Saved Addresses</h3></div>`
+    el.innerHTML += `<h4>Saved Addresses</h4>`
     data.customer_addresses.forEach(a => {
       el.innerHTML += `
         <div class="card">
-          <div class="row">
-            <div class="value">${a.label}</div>
-            <span class="pill">Address</span>
-          </div>
-          <div class="label" style="margin-top:8px">
+          <strong>${a.label}</strong>
+          <div class="meta" style="margin-top:6px">
             ${a.autofill_location}
           </div>
         </div>
