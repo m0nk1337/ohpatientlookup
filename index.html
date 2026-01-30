@@ -1,107 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Patient & Coupons Tool</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body {
-      font-family: Inter, system-ui;
-      background: #f7f8fa;
-      padding: 24px;
-    }
-    .card {
-      max-width: 900px;
-      margin: auto;
-      background: #fff;
-      border-radius: 14px;
-      padding: 24px;
-      box-shadow: 0 12px 30px rgba(0,0,0,.08);
-    }
-    input, button {
-      padding: 14px;
-      border-radius: 10px;
-      border: 1px solid #ddd;
-      font-size: 15px;
-      width: 100%;
-      margin-bottom: 12px;
-    }
-    button {
-      background: #ff7a00;
-      color: #fff;
-      border: none;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    h3 {
-      margin-top: 24px;
-      color: #ff7a00;
-    }
-    .box {
-      border: 1px solid #eee;
-      padding: 14px;
-      border-radius: 10px;
-      margin-top: 10px;
-    }
-    .muted {
-      color: #666;
-      font-size: 14px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Patient & Coupons Tool</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body { font-family: Inter, sans-serif; background: #f7f8fa; padding: 24px; }
+.card { max-width: 900px; margin: auto; background: #fff; border-radius: 14px; padding: 24px; box-shadow: 0 12px 30px rgba(0,0,0,.08); }
+input, button { padding: 14px; border-radius: 10px; border: 1px solid #ddd; font-size: 15px; width: 100%; margin-bottom: 12px; }
+button { background: #ff7a00; color: #fff; border: none; font-weight: 600; cursor: pointer; }
+h3 { margin-top: 24px; color: #ff7a00; }
+.box { border: 1px solid #eee; padding: 14px; border-radius: 10px; margin-top: 10px; }
+.muted { color: #666; font-size: 14px; }
+</style>
 </head>
-
 <body>
-  <div class="card">
-    <h2>Patient Lookup + Coupons</h2>
-
-    <input id="mobile" placeholder="Enter mobile number" />
-
-    <button onclick="lookup()">Fetch Patient</button>
-    <button onclick="coupons()">Check Coupons</button>
-
-    <div id="output"></div>
-  </div>
+<div class="card">
+<h2>Patient Lookup + Coupons</h2>
+<input id="mobile" placeholder="Enter mobile number" />
+<button onclick="lookup()">Fetch Patient</button>
+<button onclick="coupons()">Check Coupons</button>
+<div id="output"></div>
+</div>
 
 <script>
+const WORKER_URL = "https://long-leaf-8942.ashishrohra-ttb.workers.dev"
+
 async function lookup() {
   const mobile = document.getElementById("mobile").value
   const out = document.getElementById("output")
-
   out.innerHTML = "Loading patient..."
-
-  const res = await fetch(`/api/patient?mobile=${mobile}`)
+  const res = await fetch(`${WORKER_URL}/api/patient?mobile=${mobile}`)
   const data = await res.json()
-
-  if (data.error) {
-    out.innerHTML = data.error
-    return
-  }
-
-  out.innerHTML = `
-    <h3>${data.first_name}</h3>
-    <div class="muted">${data.mobile_number} · ${data.gender}</div>
-  `
-
+  if (data.error) { out.innerHTML = data.error; return }
+  out.innerHTML = `<h3>${data.first_name}</h3><div class="muted">${data.mobile_number} · ${data.gender}</div>`
   if (data.customer_relations?.length) {
     out.innerHTML += "<h3>Members</h3>"
     data.customer_relations.forEach(m => {
-      out.innerHTML += `
-        <div class="box">
-          <strong>${m.name}</strong>
-          <div class="muted">${m.relationship} · ${m.gender} · Age ${m.age}</div>
-        </div>
-      `
+      out.innerHTML += `<div class="box"><strong>${m.name}</strong><div class="muted">${m.relationship} · ${m.gender} · Age ${m.age}</div></div>`
     })
   }
-
   if (data.customer_addresses?.length) {
     out.innerHTML += "<h3>Addresses</h3>"
     data.customer_addresses.forEach(a => {
-      out.innerHTML += `
-        <div class="box">
-          <strong>${a.label}</strong>
-          <div class="muted">${a.autofill_location}</div>
-        </div>
-      `
+      out.innerHTML += `<div class="box"><strong>${a.label}</strong><div class="muted">${a.autofill_location}</div></div>`
     })
   }
 }
@@ -109,30 +51,17 @@ async function lookup() {
 async function coupons() {
   const mobile = document.getElementById("mobile").value
   const out = document.getElementById("output")
-
   out.innerHTML = "Checking coupons..."
-
-  const res = await fetch("/api/coupons", {
+  const res = await fetch(`${WORKER_URL}/api/coupons`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ userNumber: mobile })
   })
-
   const data = await res.json()
-
-  if (!data.eligibleCoupons?.length) {
-    out.innerHTML = "No coupons available"
-    return
-  }
-
+  if (!data.eligibleCoupons?.length) { out.innerHTML = "No coupons available"; return }
   out.innerHTML = "<h3>Eligible Coupons</h3>"
   data.eligibleCoupons.forEach(c => {
-    out.innerHTML += `
-      <div class="box">
-        <strong>${c.couponCode}</strong>
-        <div class="muted">${c.shortDescription}</div>
-      </div>
-    `
+    out.innerHTML += `<div class="box"><strong>${c.couponCode}</strong><div class="muted">${c.shortDescription}</div></div>`
   })
 }
 </script>
