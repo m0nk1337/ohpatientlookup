@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#08090c" />
 <title>Coupon Checker · Orange Health</title>
-<meta name="description" content="Enter a mobile number and instantly see which Orange Health coupons apply to a cart." />
+<meta name="description" content="Enter a mobile number and instantly see which Orange Health coupons apply." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23ff7a18'/%3E%3Cpath d='M22 18h20a4 4 0 0 1 4 4v6a6 6 0 0 0 0 12v6a4 4 0 0 1-4 4H22a4 4 0 0 1-4-4v-6a6 6 0 0 0 0-12v-6a4 4 0 0 1 4-4z' fill='%23140a02'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -32,7 +32,7 @@
 
   body {
     margin: 0;
-    padding: 40px 20px 72px;
+    padding: 40px 20px 48px;
     font-family: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     color: var(--text);
     background:
@@ -47,7 +47,7 @@
 
   .shell {
     width: 100%;
-    max-width: 960px;
+    max-width: 900px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -148,7 +148,6 @@
   .phone {
     display: flex;
     align-items: center;
-    gap: 0;
     border: 1px solid var(--border);
     background: rgba(0, 0, 0, 0.35);
     border-radius: 18px;
@@ -186,78 +185,6 @@
   }
 
   .phone input::placeholder { color: #4b5361; letter-spacing: 0.14em; }
-
-  /* ------------------------------------------------------------ chips */
-
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 9px;
-    margin: 20px 0 0;
-  }
-
-  .chip {
-    appearance: none;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--muted);
-    font: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 10px 16px;
-    border-radius: 999px;
-    cursor: pointer;
-    transition: all 0.18s var(--ease);
-  }
-
-  .chip:hover { color: var(--text); background: var(--surface-2); border-color: rgba(255, 255, 255, 0.16); }
-
-  .chip.active {
-    color: #170a02;
-    background: linear-gradient(135deg, #ffa045, var(--accent) 45%, var(--accent-2));
-    border-color: transparent;
-    box-shadow: 0 10px 26px -12px rgba(255, 100, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  }
-
-  .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-
-  /* ------------------------------------------------------------ fields */
-
-  .cart-fields {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
-    margin-top: 16px;
-  }
-
-  .mini label {
-    display: block;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--faint);
-    margin-bottom: 7px;
-  }
-
-  .mini input, .mini select {
-    width: 100%;
-    border: 1px solid var(--border);
-    background: rgba(0, 0, 0, 0.35);
-    color: var(--text);
-    border-radius: 13px;
-    padding: 12px 13px;
-    font: inherit;
-    font-size: 14px;
-    font-weight: 600;
-    outline: 0;
-    transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
-  }
-
-  .mini input:focus, .mini select:focus {
-    border-color: rgba(255, 122, 24, 0.6);
-    box-shadow: 0 0 0 4px rgba(255, 122, 24, 0.1);
-  }
 
   /* ---------------------------------------------------------- advanced */
 
@@ -299,6 +226,35 @@
     margin-top: 14px;
   }
 
+  .mini label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 7px;
+  }
+
+  .mini select {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.35);
+    color: var(--text);
+    border-radius: 13px;
+    padding: 12px 13px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    outline: 0;
+    transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  }
+
+  .mini select:focus {
+    border-color: rgba(255, 122, 24, 0.6);
+    box-shadow: 0 0 0 4px rgba(255, 122, 24, 0.1);
+  }
+
   /* ------------------------------------------------------------ button */
 
   .submit {
@@ -314,7 +270,6 @@
     color: #170a02;
     background: linear-gradient(135deg, #ffb268, #ff7a18 42%, #ff3d00);
     cursor: pointer;
-    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -385,29 +340,6 @@
     background: linear-gradient(90deg, var(--green), #6ff0c4);
     box-shadow: 0 0 18px rgba(47, 214, 163, 0.5);
     transition: width 0.6s var(--ease);
-  }
-
-  .section-title {
-    margin: 8px 0 0;
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--faint);
-    display: flex;
-    align-items: center;
-    gap: 9px;
-  }
-
-  .section-title em {
-    font-style: normal;
-    color: var(--muted);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 2px 8px;
-    font-size: 11px;
-    letter-spacing: 0;
   }
 
   .grid {
@@ -568,20 +500,6 @@
 
   .hidden { display: none !important; }
 
-  .note {
-    display: flex;
-    gap: 10px;
-    padding: 13px 15px;
-    border-radius: 15px;
-    border: 1px solid rgba(255, 122, 24, 0.25);
-    background: rgba(255, 122, 24, 0.07);
-    font-size: 12.5px;
-    line-height: 1.5;
-    color: #ffc79a;
-  }
-
-  .note svg { flex: none; width: 16px; height: 16px; margin-top: 1px; }
-
   .empty, .error {
     padding: 34px 22px;
     border-radius: 20px;
@@ -636,20 +554,19 @@
   /* footer */
   .foot {
     text-align: center;
-    font-size: 11.5px;
-    color: #565e6b;
-    line-height: 1.6;
-    padding: 4px 10px 0;
+    font-size: 12px;
+    color: #6b7280;
+    padding-top: 4px;
   }
 
-  .foot a { color: #7b8492; }
+  .foot .heart { color: var(--accent); }
 
   /* ----------------------------------------------------------- responsive */
 
   @media (max-width: 640px) {
-    body { padding: 24px 14px 60px; }
+    body { padding: 24px 14px 40px; }
     .panel { padding: 18px; border-radius: 22px; }
-    .cart-fields, .advanced-grid { grid-template-columns: 1fr; }
+    .advanced-grid { grid-template-columns: 1fr; }
     .brand h1 { font-size: 18px; }
     .phone input { font-size: 17px; letter-spacing: 0.12em; }
     .grid { grid-template-columns: 1fr; }
@@ -697,29 +614,7 @@
           autocomplete="tel-national"
           maxlength="10"
           placeholder="98765 43210"
-          aria-describedby="phoneHint"
         />
-      </div>
-
-      <div class="chips" role="group" aria-label="Cart profile">
-        <button type="button" class="chip active" data-mode="max">Max cart · all coupons</button>
-        <button type="button" class="chip" data-mode="number">Number only</button>
-        <button type="button" class="chip" data-mode="cart">Custom cart</button>
-      </div>
-
-      <div class="cart-fields hidden" id="cartFields">
-        <div class="mini">
-          <label for="orderValue">Order value (₹)</label>
-          <input id="orderValue" name="orderValue" type="number" min="1" step="1" value="14999" />
-        </div>
-        <div class="mini">
-          <label for="patientAge">Patient age</label>
-          <input id="patientAge" name="patientAge" type="number" min="0" max="120" step="1" value="68" />
-        </div>
-        <div class="mini">
-          <label for="patientCount">Patients</label>
-          <input id="patientCount" name="patientCount" type="number" min="1" max="4" step="1" value="1" />
-        </div>
       </div>
 
       <details class="advanced">
@@ -758,10 +653,7 @@
     <div class="empty">Enter a mobile number to see eligible coupons.</div>
   </section>
 
-  <p class="foot">
-    Unofficial demo. Coupon data comes from Orange Health's public voucher endpoint.<br />
-    First-order rules are not enforced server-side — treat results as indicative.
-  </p>
+  <p class="foot">made with <span class="heart">&lt;3</span> by ashish</p>
 </div>
 
 <div class="toast" id="toast" role="status">
@@ -773,10 +665,7 @@
 (() => {
   "use strict";
 
-  /* ------------------------------------------------------------ config
-   * Point this at your deployed Worker. You can also override it at
-   * runtime with ?api=https://your-worker.workers.dev
-   */
+  /* Point this at your deployed Worker (or open the page with ?api=https://...) */
   const DEFAULT_API = "https://long-leaf-8942.ashishrohra-ttb.workers.dev";
 
   const API_BASE = (() => {
@@ -790,7 +679,6 @@
 
   const NOT_CONFIGURED = API_BASE.includes("YOUR-SUBDOMAIN");
 
-  /* ------------------------------------------------------------- refs */
   const $ = (sel) => document.querySelector(sel);
   const form = $("#form");
   const phoneInput = $("#phone");
@@ -799,14 +687,11 @@
   const submitLabel = $("#submitLabel");
   const statusPill = $("#statusPill");
   const statusText = $("#statusText");
-  const cartFields = $("#cartFields");
   const toastEl = $("#toast");
   const toastText = $("#toastText");
 
-  let mode = "max";
   let toastTimer = null;
 
-  /* ---------------------------------------------------------- helpers */
   const esc = (value) =>
     String(value ?? "").replace(/[&<>"']/g, (ch) => ({
       "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
@@ -821,7 +706,6 @@
     toastTimer = setTimeout(() => toastEl.classList.remove("show"), 1800);
   }
 
-  /* ------------------------------------------------------ health check */
   async function ping() {
     if (NOT_CONFIGURED) {
       statusText.textContent = "worker not configured";
@@ -841,20 +725,10 @@
     }
   }
 
-  /* ------------------------------------------------------------- modes */
-  document.querySelectorAll(".chip").forEach((chip) => {
-    chip.addEventListener("click", () => {
-      mode = chip.dataset.mode;
-      document.querySelectorAll(".chip").forEach((c) => c.classList.toggle("active", c === chip));
-      cartFields.classList.toggle("hidden", mode !== "cart");
-    });
-  });
-
   phoneInput.addEventListener("input", () => {
     phoneInput.value = phoneInput.value.replace(/\D/g, "").slice(0, 10);
   });
 
-  /* ------------------------------------------------------------ render */
   const amountLabel = (coupon) =>
     coupon.isFlat ? `${money(coupon.amount)} off` : `${coupon.amount}% off`;
 
@@ -901,51 +775,32 @@
     const total = eligible.length + notApplicable.length;
     const pct = total ? Math.round((eligible.length / total) * 100) : 0;
 
-    const tally = `
-      <div class="tally">
-        <span class="good">${eligible.length} eligible</span>
-        <span class="flat">${notApplicable.length} unavailable</span>
-      </div>`;
-
-    const sections = [];
+    const pieces = [
+      `<div class="result-head">
+         <h2>Results</h2>
+         <div class="tally">
+           <span class="good">${eligible.length} eligible</span>
+           <span class="flat">${notApplicable.length} unavailable</span>
+         </div>
+       </div>`,
+      `<div class="bar" role="img" aria-label="${pct}% of coupons eligible">
+         <i style="width:${pct}%"></i>
+       </div>`,
+    ];
 
     if (eligible.length) {
-      sections.push(`
-        <h3 class="section-title">Eligible <em>${eligible.length}</em></h3>
-        <div class="grid">${eligible.map((c) => couponCard(c, true)).join("")}</div>`);
+      pieces.push(`<div class="grid">${eligible.map((c) => couponCard(c, true)).join("")}</div>`);
     }
 
     if (notApplicable.length) {
-      sections.push(`
-        <h3 class="section-title">Not applicable <em>${notApplicable.length}</em></h3>
-        <div class="grid">${notApplicable.map((c) => couponCard(c, false)).join("")}</div>`);
+      pieces.push(`<div class="grid">${notApplicable.map((c) => couponCard(c, false)).join("")}</div>`);
     }
 
-    const note = data.mode === "number"
-      ? `<div class="note">
-           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-             <circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>
-           </svg>
-           <span>Number-only mode returns the full catalogue. Eligibility depends on the cart —
-           switch to <strong>Max cart</strong> or <strong>Custom cart</strong> to evaluate it.</span>
-         </div>`
-      : "";
+    if (!total) pieces.push(`<div class="empty">No coupons returned for this number.</div>`);
 
-    results.innerHTML = `
-      <div class="result-head">
-        <h2>Results</h2>
-        ${tally}
-      </div>
-      <div class="bar" role="img" aria-label="${pct}% of coupons eligible">
-        <i style="width:${pct}%"></i>
-      </div>
-      ${note}
-      ${sections.join("") || `<div class="empty">No coupons returned for this input.</div>`}
-    `;
+    results.innerHTML = pieces.join("");
   }
 
-  /* ------------------------------------------------------------ search */
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -961,19 +816,6 @@
       return;
     }
 
-    const payload = {
-      userNumber,
-      mode,
-      cityCode: $("#cityCode").value,
-      devicePlatform: $("#devicePlatform").value,
-    };
-
-    if (mode === "cart") {
-      payload.orderValue = Number($("#orderValue").value) || 14999;
-      payload.patientAge = Number($("#patientAge").value) || 68;
-      payload.patientCount = Number($("#patientCount").value) || 1;
-    }
-
     submitBtn.disabled = true;
     submitBtn.classList.add("loading");
     submitLabel.textContent = "Checking…";
@@ -983,7 +825,11 @@
       const res = await fetch(API_BASE + "/api/coupons", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          userNumber,
+          cityCode: $("#cityCode").value,
+          devicePlatform: $("#devicePlatform").value,
+        }),
       });
 
       const data = await res.json().catch(() => null);
@@ -1002,7 +848,6 @@
     }
   });
 
-  /* -------------------------------------------------------------- copy */
   document.addEventListener("click", async (event) => {
     const btn = event.target.closest(".icon-btn[data-code]");
     if (!btn) return;
@@ -1024,7 +869,6 @@
     }
   });
 
-  /* --------------------------------------------------------------- init */
   ping();
 })();
 </script>
