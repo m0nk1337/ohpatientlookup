@@ -1,437 +1,1032 @@
-<!DOCTYPE html>
-<!--
-=========================================================
- ORIGINAL PATIENT & COUPONS LOOKUP CODE
- Preserved for future reference. Currently inactive.
-=========================================================
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Patient & Coupons Lookup</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body { font-family: Inter, Arial, sans-serif; background: #f7f8fa; padding: 24px; }
-    .container { max-width: 600px; margin: auto; background: #fff; border-radius: 14px; padding: 24px; box-shadow: 0 12px 30px rgba(0,0,0,.08); }
-    input, button { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #ddd; font-size: 16px; margin-bottom: 12px; }
-    button { background: #ff7a00; color: white; border: none; cursor: pointer; font-weight: 600; }
-    h3 { margin-top: 24px; color: #ff7a00; }
-    .box { border: 1px solid #eee; padding: 14px; border-radius: 10px; margin-top: 10px; }
-    .muted { color: #666; font-size: 14px; }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#08090c" />
+<title>Coupon Checker · Orange Health</title>
+<meta name="description" content="Enter a mobile number and instantly see which Orange Health coupons apply to a cart." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23ff7a18'/%3E%3Cpath d='M22 18h20a4 4 0 0 1 4 4v6a6 6 0 0 0 0 12v6a4 4 0 0 1-4 4H22a4 4 0 0 1-4-4v-6a6 6 0 0 0 0-12v-6a4 4 0 0 1 4-4z' fill='%23140a02'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #08090c;
+    --text: #f5f6f8;
+    --muted: #98a0ad;
+    --faint: #6b7280;
+    --border: rgba(255, 255, 255, 0.09);
+    --surface: rgba(255, 255, 255, 0.04);
+    --surface-2: rgba(255, 255, 255, 0.065);
+    --accent: #ff7a18;
+    --accent-2: #ff3d00;
+    --green: #2fd6a3;
+    --radius: 26px;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    padding: 40px 20px 72px;
+    font-family: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(900px 620px at 12% -12%, rgba(255, 122, 24, 0.18), transparent 62%),
+      radial-gradient(760px 520px at 96% -4%, rgba(255, 61, 0, 0.12), transparent 58%),
+      radial-gradient(900px 700px at 50% 118%, rgba(47, 214, 163, 0.08), transparent 60%),
+      var(--bg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    min-height: 100%;
+  }
+
+  .shell {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  /* ------------------------------------------------------------ header */
+
+  .masthead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .mark {
+    width: 48px;
+    height: 48px;
+    border-radius: 15px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(145deg, var(--accent), var(--accent-2));
+    box-shadow: 0 14px 34px -12px rgba(255, 100, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    flex: none;
+  }
+
+  .mark svg { width: 24px; height: 24px; display: block; }
+
+  .brand h1 {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  .brand p {
+    margin: 3px 0 0;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .status-pill i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--faint);
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.04);
+  }
+
+  .status-pill.live i { background: var(--green); box-shadow: 0 0 0 4px rgba(47, 214, 163, 0.16); }
+
+  /* -------------------------------------------------------------- card */
+
+  .panel {
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02));
+    box-shadow: 0 40px 90px -40px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    padding: 24px;
+  }
+
+  .field-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 9px;
+  }
+
+  /* ------------------------------------------------------------ phone */
+
+  .phone {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 18px;
+    transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+    overflow: hidden;
+  }
+
+  .phone:focus-within {
+    border-color: rgba(255, 122, 24, 0.6);
+    box-shadow: 0 0 0 4px rgba(255, 122, 24, 0.12);
+  }
+
+  .phone .cc {
+    padding: 17px 16px;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--muted);
+    border-right: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.02);
+    flex: none;
+  }
+
+  .phone input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--text);
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    padding: 17px 18px;
+  }
+
+  .phone input::placeholder { color: #4b5361; letter-spacing: 0.14em; }
+
+  /* ------------------------------------------------------------ chips */
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin: 20px 0 0;
+  }
+
+  .chip {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.18s var(--ease);
+  }
+
+  .chip:hover { color: var(--text); background: var(--surface-2); border-color: rgba(255, 255, 255, 0.16); }
+
+  .chip.active {
+    color: #170a02;
+    background: linear-gradient(135deg, #ffa045, var(--accent) 45%, var(--accent-2));
+    border-color: transparent;
+    box-shadow: 0 10px 26px -12px rgba(255, 100, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+
+  .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ------------------------------------------------------------ fields */
+
+  .cart-fields {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .mini label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 7px;
+  }
+
+  .mini input, .mini select {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.35);
+    color: var(--text);
+    border-radius: 13px;
+    padding: 12px 13px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    outline: 0;
+    transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  }
+
+  .mini input:focus, .mini select:focus {
+    border-color: rgba(255, 122, 24, 0.6);
+    box-shadow: 0 0 0 4px rgba(255, 122, 24, 0.1);
+  }
+
+  /* ---------------------------------------------------------- advanced */
+
+  details.advanced {
+    margin-top: 16px;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+  }
+
+  details.advanced summary {
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--faint);
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    user-select: none;
+    transition: color 0.18s var(--ease);
+  }
+
+  details.advanced summary::-webkit-details-marker { display: none; }
+  details.advanced summary:hover { color: var(--muted); }
+  details.advanced summary::before {
+    content: "";
+    width: 7px; height: 7px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(-45deg) translateY(-1px);
+    transition: transform 0.2s var(--ease);
+  }
+  details.advanced[open] summary::before { transform: rotate(45deg) translateY(-1px); }
+
+  .advanced-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  /* ------------------------------------------------------------ button */
+
+  .submit {
+    margin-top: 20px;
+    width: 100%;
+    border: 0;
+    border-radius: 17px;
+    padding: 17px 20px;
+    font: inherit;
+    font-size: 15.5px;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    color: #170a02;
+    background: linear-gradient(135deg, #ffb268, #ff7a18 42%, #ff3d00);
+    cursor: pointer;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 20px 44px -18px rgba(255, 90, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    transition: transform 0.18s var(--ease), box-shadow 0.18s var(--ease), filter 0.18s var(--ease);
+  }
+
+  .submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 26px 54px -18px rgba(255, 90, 0, 0.95); }
+  .submit:active:not(:disabled) { transform: translateY(0); }
+  .submit:disabled { cursor: progress; filter: saturate(0.7) brightness(0.9); }
+
+  .spinner {
+    width: 17px; height: 17px;
+    border-radius: 50%;
+    border: 2.5px solid rgba(23, 10, 2, 0.28);
+    border-top-color: #170a02;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  .submit.loading .spinner { display: block; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ----------------------------------------------------------- results */
+
+  .results { display: flex; flex-direction: column; gap: 16px; }
+
+  .result-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .result-head h2 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .tally { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .tally span {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+  }
+
+  .tally .good { color: #a9f5dc; background: rgba(47, 214, 163, 0.12); border-color: rgba(47, 214, 163, 0.28); }
+  .tally .flat { color: var(--muted); background: var(--surface); border-color: var(--border); }
+
+  .bar {
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.07);
+    overflow: hidden;
+  }
+
+  .bar > i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--green), #6ff0c4);
+    box-shadow: 0 0 18px rgba(47, 214, 163, 0.5);
+    transition: width 0.6s var(--ease);
+  }
+
+  .section-title {
+    margin: 8px 0 0;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--faint);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .section-title em {
+    font-style: normal;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-size: 11px;
+    letter-spacing: 0;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(282px, 1fr));
+    gap: 14px;
+  }
+
+  /* ------------------------------------------------------------ coupon */
+
+  .coupon {
+    position: relative;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.022));
+    padding: 17px 18px 15px 22px;
+    overflow: hidden;
+    transition: transform 0.2s var(--ease), border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+    animation: rise 0.45s var(--ease) both;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .coupon::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: linear-gradient(180deg, #ffb268, var(--accent) 45%, var(--accent-2));
+  }
+
+  .coupon:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 26px 50px -26px rgba(0, 0, 0, 0.95);
+  }
+
+  .coupon.na { opacity: 0.62; }
+  .coupon.na::before { background: rgba(255, 255, 255, 0.14); }
+  .coupon.na:hover { opacity: 0.85; }
+
+  .coupon-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .code-wrap { display: flex; align-items: center; gap: 7px; min-width: 0; }
+
+  .code {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .icon-btn {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.16s var(--ease);
+    padding: 0;
+  }
+
+  .icon-btn:hover { color: var(--text); background: var(--surface-2); border-color: rgba(255, 255, 255, 0.22); }
+  .icon-btn svg { width: 14px; height: 14px; }
+
+  .amount {
+    flex: none;
+    font-size: 12.5px;
+    font-weight: 800;
+    padding: 6px 11px;
+    border-radius: 999px;
+    color: #ffc79a;
+    background: rgba(255, 122, 24, 0.13);
+    border: 1px solid rgba(255, 122, 24, 0.3);
+    white-space: nowrap;
+  }
+
+  .coupon.na .amount {
+    color: var(--muted);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--border);
+  }
+
+  .desc {
+    margin: 12px 0 0;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: #c7ccd6;
+  }
+
+  .terms {
+    margin: 11px 0 0;
+    padding: 11px 0 0;
+    list-style: none;
+    border-top: 1px dashed rgba(255, 255, 255, 0.11);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .terms li {
+    position: relative;
+    padding-left: 13px;
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--faint);
+  }
+
+  .terms li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 6px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.22);
+  }
+
+  .coupon footer {
+    margin-top: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  .coupon footer .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--faint);
+  }
+
+  .coupon.ok footer { color: #8defcb; }
+  .coupon.ok footer .dot { background: var(--green); box-shadow: 0 0 0 4px rgba(47, 214, 163, 0.14); }
+
+  /* --------------------------------------------------------- utilities */
+
+  .hidden { display: none !important; }
+
+  .note {
+    display: flex;
+    gap: 10px;
+    padding: 13px 15px;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 122, 24, 0.25);
+    background: rgba(255, 122, 24, 0.07);
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: #ffc79a;
+  }
+
+  .note svg { flex: none; width: 16px; height: 16px; margin-top: 1px; }
+
+  .empty, .error {
+    padding: 34px 22px;
+    border-radius: 20px;
+    border: 1px dashed rgba(255, 255, 255, 0.14);
+    text-align: center;
+    color: var(--muted);
+    font-size: 13.5px;
+  }
+
+  .error { border-color: rgba(255, 90, 60, 0.35); background: rgba(255, 60, 40, 0.07); color: #ffb3a3; }
+
+  /* skeleton */
+  .skeleton { pointer-events: none; }
+  .sk {
+    height: 12px;
+    border-radius: 7px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05));
+    background-size: 220% 100%;
+    animation: shimmer 1.3s infinite linear;
+  }
+  .sk + .sk { margin-top: 10px; }
+  .sk-a { width: 45%; height: 16px; }
+  .sk-b { width: 90%; }
+  .sk-c { width: 70%; }
+  @keyframes shimmer { to { background-position: -220% 0; } }
+
+  /* toast */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 30px;
+    transform: translate(-50%, 20px);
+    opacity: 0;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 12px 18px;
+    border-radius: 999px;
+    background: #14171d;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 22px 50px -18px rgba(0, 0, 0, 0.95);
+    font-size: 13px;
+    font-weight: 700;
+    transition: all 0.3s var(--ease);
+    z-index: 50;
+  }
+
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .toast svg { width: 15px; height: 15px; color: var(--green); }
+
+  /* footer */
+  .foot {
+    text-align: center;
+    font-size: 11.5px;
+    color: #565e6b;
+    line-height: 1.6;
+    padding: 4px 10px 0;
+  }
+
+  .foot a { color: #7b8492; }
+
+  /* ----------------------------------------------------------- responsive */
+
+  @media (max-width: 640px) {
+    body { padding: 24px 14px 60px; }
+    .panel { padding: 18px; border-radius: 22px; }
+    .cart-fields, .advanced-grid { grid-template-columns: 1fr; }
+    .brand h1 { font-size: 18px; }
+    .phone input { font-size: 17px; letter-spacing: 0.12em; }
+    .grid { grid-template-columns: 1fr; }
+    .status-pill { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h2>Patient & Coupons Lookup</h2>
-    <input id="mobile" placeholder="Enter mobile number" />
-    <button onclick="fetchPatient()">Fetch Patient</button>
-    <button onclick="checkCoupons()">Check Coupons</button>
-    <div id="output"></div>
-  </div>
+<div class="shell">
 
-  <script>
-    const WORKER_URL = "https://long-leaf-8942.ashishrohra-ttb.workers.dev"
+  <header class="masthead">
+    <div class="brand">
+      <span class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#170a02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 8V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2.5 2.5 0 0 0 0 5v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5a2.5 2.5 0 0 0 0-5z"/>
+          <path d="M13 6v2M13 11v2M13 16v2"/>
+        </svg>
+      </span>
+      <div>
+        <h1>Coupon Checker</h1>
+        <p>Enter a number · see every coupon that applies</p>
+      </div>
+    </div>
+    <span class="status-pill" id="statusPill"><i></i><span id="statusText">checking…</span></span>
+  </header>
 
-    async function fetchPatient() {
-      const mobile = document.getElementById("mobile").value
-      const out = document.getElementById("output")
-      out.innerHTML = "Loading patient info..."
-      const res = await fetch(`${WORKER_URL}/api/patient?mobile=${mobile}`)
-      const data = await res.json()
+  <section class="panel">
+    <form id="form" novalidate>
+      <label class="field-label" for="phone">Mobile number</label>
+      <div class="phone">
+        <span class="cc">+91</span>
+        <input
+          id="phone"
+          name="phone"
+          type="tel"
+          inputmode="numeric"
+          autocomplete="tel-national"
+          maxlength="10"
+          placeholder="98765 43210"
+          aria-describedby="phoneHint"
+        />
+      </div>
 
-      if (data.error) { out.innerHTML = data.error; return }
+      <div class="chips" role="group" aria-label="Cart profile">
+        <button type="button" class="chip active" data-mode="max">Max cart · all coupons</button>
+        <button type="button" class="chip" data-mode="number">Number only</button>
+        <button type="button" class="chip" data-mode="cart">Custom cart</button>
+      </div>
 
-      out.innerHTML = `
-        <div class="box">
-          <h3>${data.first_name}</h3>
-          <div class="muted">Mobile: ${data.mobile_number}</div>
-          <div class="muted">DOB: ${data.dob}</div>
-          <span class="muted">${data.gender}</span>
+      <div class="cart-fields hidden" id="cartFields">
+        <div class="mini">
+          <label for="orderValue">Order value (₹)</label>
+          <input id="orderValue" name="orderValue" type="number" min="1" step="1" value="14999" />
         </div>
-      `
+        <div class="mini">
+          <label for="patientAge">Patient age</label>
+          <input id="patientAge" name="patientAge" type="number" min="0" max="120" step="1" value="68" />
+        </div>
+        <div class="mini">
+          <label for="patientCount">Patients</label>
+          <input id="patientCount" name="patientCount" type="number" min="1" max="4" step="1" value="1" />
+        </div>
+      </div>
 
-      if (data.customer_relations?.length) {
-        out.innerHTML += "<h3>Members</h3>"
-        data.customer_relations.forEach(m => {
-          out.innerHTML += `
-            <div class="box">
-              <strong>${m.name}</strong>
-              <div class="muted">${m.relationship} · ${m.gender} · Age ${m.age}</div>
-            </div>
-          `
-        })
-      }
+      <details class="advanced">
+        <summary>Advanced</summary>
+        <div class="advanced-grid">
+          <div class="mini">
+            <label for="cityCode">City</label>
+            <select id="cityCode" name="cityCode">
+              <option value="BLR" selected>Bengaluru</option>
+              <option value="MUM">Mumbai</option>
+              <option value="NDM">Delhi NCR</option>
+              <option value="HYD">Hyderabad</option>
+              <option value="NOA">Noida</option>
+              <option value="DEL">Gurugram</option>
+              <option value="PNQ">Pune</option>
+            </select>
+          </div>
+          <div class="mini">
+            <label for="devicePlatform">Platform</label>
+            <select id="devicePlatform" name="devicePlatform">
+              <option value="app" selected>App</option>
+              <option value="web">Web</option>
+            </select>
+          </div>
+        </div>
+      </details>
 
-      if (data.customer_addresses?.length) {
-        out.innerHTML += "<h3>Saved Addresses</h3>"
-        data.customer_addresses.forEach(a => {
-          out.innerHTML += `
-            <div class="box">
-              <strong>${a.label}</strong>
-              <div class="muted">${a.autofill_location}</div>
-            </div>
-          `
-        })
+      <button class="submit" id="submit" type="submit">
+        <span class="spinner" aria-hidden="true"></span>
+        <span id="submitLabel">Check coupons</span>
+      </button>
+    </form>
+  </section>
+
+  <section class="results" id="results" aria-live="polite">
+    <div class="empty">Enter a mobile number to see eligible coupons.</div>
+  </section>
+
+  <p class="foot">
+    Unofficial demo. Coupon data comes from Orange Health's public voucher endpoint.<br />
+    First-order rules are not enforced server-side — treat results as indicative.
+  </p>
+</div>
+
+<div class="toast" id="toast" role="status">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg>
+  <span id="toastText">Copied</span>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  /* ------------------------------------------------------------ config
+   * Point this at your deployed Worker. You can also override it at
+   * runtime with ?api=https://your-worker.workers.dev
+   */
+  const DEFAULT_API = "https://long-leaf-8942.ashishrohra-ttb.workers.dev";
+
+  const API_BASE = (() => {
+    const fromQuery = new URLSearchParams(location.search).get("api");
+    if (fromQuery) {
+      localStorage.setItem("oh_api_base", fromQuery);
+      return fromQuery.replace(/\/+$/, "");
+    }
+    return (localStorage.getItem("oh_api_base") || DEFAULT_API).replace(/\/+$/, "");
+  })();
+
+  const NOT_CONFIGURED = API_BASE.includes("YOUR-SUBDOMAIN");
+
+  /* ------------------------------------------------------------- refs */
+  const $ = (sel) => document.querySelector(sel);
+  const form = $("#form");
+  const phoneInput = $("#phone");
+  const results = $("#results");
+  const submitBtn = $("#submit");
+  const submitLabel = $("#submitLabel");
+  const statusPill = $("#statusPill");
+  const statusText = $("#statusText");
+  const cartFields = $("#cartFields");
+  const toastEl = $("#toast");
+  const toastText = $("#toastText");
+
+  let mode = "max";
+  let toastTimer = null;
+
+  /* ---------------------------------------------------------- helpers */
+  const esc = (value) =>
+    String(value ?? "").replace(/[&<>"']/g, (ch) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+    }[ch]));
+
+  const money = (n) => "₹" + Number(n || 0).toLocaleString("en-IN");
+
+  function toast(message) {
+    toastText.textContent = message;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove("show"), 1800);
+  }
+
+  /* ------------------------------------------------------ health check */
+  async function ping() {
+    if (NOT_CONFIGURED) {
+      statusText.textContent = "worker not configured";
+      return;
+    }
+    try {
+      const res = await fetch(API_BASE + "/api/health", { cache: "no-store" });
+      const data = await res.json();
+      if (data && data.ok) {
+        statusPill.classList.add("live");
+        statusText.textContent = "connected";
+      } else {
+        statusText.textContent = "worker error";
       }
+    } catch {
+      statusText.textContent = "worker offline";
+    }
+  }
+
+  /* ------------------------------------------------------------- modes */
+  document.querySelectorAll(".chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      mode = chip.dataset.mode;
+      document.querySelectorAll(".chip").forEach((c) => c.classList.toggle("active", c === chip));
+      cartFields.classList.toggle("hidden", mode !== "cart");
+    });
+  });
+
+  phoneInput.addEventListener("input", () => {
+    phoneInput.value = phoneInput.value.replace(/\D/g, "").slice(0, 10);
+  });
+
+  /* ------------------------------------------------------------ render */
+  const amountLabel = (coupon) =>
+    coupon.isFlat ? `${money(coupon.amount)} off` : `${coupon.amount}% off`;
+
+  function couponCard(coupon, eligible) {
+    const terms = coupon.terms.length
+      ? `<ul class="terms">${coupon.terms.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>`
+      : "";
+
+    return `
+      <article class="coupon ${eligible ? "ok" : "na"}">
+        <div class="coupon-head">
+          <div class="code-wrap">
+            <span class="code">${esc(coupon.code)}</span>
+            <button class="icon-btn" type="button" data-code="${esc(coupon.code)}"
+                    aria-label="Copy ${esc(coupon.code)}" title="Copy code">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="9" y="9" width="12" height="12" rx="2.5"/>
+                <path d="M6 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"/>
+              </svg>
+            </button>
+          </div>
+          <span class="amount">${esc(amountLabel(coupon))}</span>
+        </div>
+        <p class="desc">${esc(coupon.description)}</p>
+        ${terms}
+        <footer><span class="dot"></span>${eligible ? "Eligible" : "Not applicable"}</footer>
+      </article>`;
+  }
+
+  function skeleton() {
+    const card = `
+      <div class="coupon skeleton">
+        <div class="sk sk-a"></div>
+        <div class="sk sk-b"></div>
+        <div class="sk sk-c"></div>
+      </div>`;
+    results.innerHTML = `<div class="grid">${card.repeat(3)}</div>`;
+  }
+
+  function render(data) {
+    const eligible = data.eligible || [];
+    const notApplicable = data.notApplicable || [];
+    const total = eligible.length + notApplicable.length;
+    const pct = total ? Math.round((eligible.length / total) * 100) : 0;
+
+    const tally = `
+      <div class="tally">
+        <span class="good">${eligible.length} eligible</span>
+        <span class="flat">${notApplicable.length} unavailable</span>
+      </div>`;
+
+    const sections = [];
+
+    if (eligible.length) {
+      sections.push(`
+        <h3 class="section-title">Eligible <em>${eligible.length}</em></h3>
+        <div class="grid">${eligible.map((c) => couponCard(c, true)).join("")}</div>`);
     }
 
-    async function checkCoupons() {
-      const mobile = document.getElementById("mobile").value
-      const out = document.getElementById("output")
-      out.innerHTML = "Checking eligible coupons..."
+    if (notApplicable.length) {
+      sections.push(`
+        <h3 class="section-title">Not applicable <em>${notApplicable.length}</em></h3>
+        <div class="grid">${notApplicable.map((c) => couponCard(c, false)).join("")}</div>`);
+    }
 
-      const res = await fetch(`${WORKER_URL}/api/coupons`, {
+    const note = data.mode === "number"
+      ? `<div class="note">
+           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+             <circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>
+           </svg>
+           <span>Number-only mode returns the full catalogue. Eligibility depends on the cart —
+           switch to <strong>Max cart</strong> or <strong>Custom cart</strong> to evaluate it.</span>
+         </div>`
+      : "";
+
+    results.innerHTML = `
+      <div class="result-head">
+        <h2>Results</h2>
+        ${tally}
+      </div>
+      <div class="bar" role="img" aria-label="${pct}% of coupons eligible">
+        <i style="width:${pct}%"></i>
+      </div>
+      ${note}
+      ${sections.join("") || `<div class="empty">No coupons returned for this input.</div>`}
+    `;
+  }
+
+  /* ------------------------------------------------------------ search */
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (NOT_CONFIGURED) {
+      results.innerHTML = `<div class="error">Worker URL not configured. Set <code>DEFAULT_API</code> in this file, or open the page with <code>?api=https://your-worker.workers.dev</code>.</div>`;
+      return;
+    }
+
+    const userNumber = phoneInput.value.replace(/\D/g, "");
+    if (userNumber.length !== 10) {
+      results.innerHTML = `<div class="error">Enter a valid 10-digit mobile number.</div>`;
+      phoneInput.focus();
+      return;
+    }
+
+    const payload = {
+      userNumber,
+      mode,
+      cityCode: $("#cityCode").value,
+      devicePlatform: $("#devicePlatform").value,
+    };
+
+    if (mode === "cart") {
+      payload.orderValue = Number($("#orderValue").value) || 14999;
+      payload.patientAge = Number($("#patientAge").value) || 68;
+      payload.patientCount = Number($("#patientCount").value) || 1;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.classList.add("loading");
+    submitLabel.textContent = "Checking…";
+    skeleton();
+
+    try {
+      const res = await fetch(API_BASE + "/api/coupons", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userNumber: mobile })
-      })
-      const data = await res.json()
+        body: JSON.stringify(payload),
+      });
 
-      if (!data.eligibleCoupons || data.eligibleCoupons.length === 0) {
-        out.innerHTML = "No coupons available"
-        return
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || !data || data.ok === false) {
+        throw new Error((data && data.error) || `Request failed (${res.status})`);
       }
 
-      out.innerHTML = "<h3>Eligible Coupons</h3>"
-      data.eligibleCoupons.forEach(c => {
-        out.innerHTML += `
-          <div class="box">
-            <strong>${c.couponCode}</strong>
-            <div class="muted">${c.shortDescription}</div>
-          </div>
-        `
-      })
+      render(data);
+    } catch (error) {
+      results.innerHTML = `<div class="error">${esc(error.message || "Something went wrong.")}</div>`;
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove("loading");
+      submitLabel.textContent = "Check coupons";
     }
-  </script>
+  });
+
+  /* -------------------------------------------------------------- copy */
+  document.addEventListener("click", async (event) => {
+    const btn = event.target.closest(".icon-btn[data-code]");
+    if (!btn) return;
+
+    const code = btn.dataset.code;
+    try {
+      await navigator.clipboard.writeText(code);
+      toast(`${code} copied`);
+    } catch {
+      const area = document.createElement("textarea");
+      area.value = code;
+      area.style.position = "fixed";
+      area.style.opacity = "0";
+      document.body.appendChild(area);
+      area.select();
+      try { document.execCommand("copy"); toast(`${code} copied`); }
+      catch { toast("Could not copy"); }
+      area.remove();
+    }
+  });
+
+  /* --------------------------------------------------------------- init */
+  ping();
+})();
+</script>
 </body>
 </html>
-
-================ END OF ORIGINAL CODE =================
--->
-
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#f8f7f4" />
-
-  <title>OH Coupon Checker</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet" />
-
-  <style>
-    :root {
-      --bg: #f8f7f4;
-      --ink: #22231f;
-      --muted: #77776f;
-      --accent: #f16a43;
-      --line: #e9e6df;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      min-height: 100vh;
-      min-height: 100svh;
-      display: grid;
-      place-items: center;
-      padding: 28px 20px;
-      background:
-        radial-gradient(ellipse at 15% 10%, #fffaf4 0%, transparent 45%),
-        radial-gradient(ellipse at 90% 90%, #f8e9e1 0%, transparent 40%),
-        var(--bg);
-      color: var(--ink);
-      font-family: "DM Sans", sans-serif;
-      overflow-x: hidden;
-    }
-
-    .page {
-      position: relative;
-      isolation: isolate;
-      width: 100%;
-      max-width: 760px;
-      min-height: 490px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 82px 32px 28px;
-      text-align: center;
-      border: 1px solid var(--line);
-      border-radius: 28px;
-      background:
-        radial-gradient(ellipse at 50% 0%, #ffffff 0%, transparent 65%),
-        rgba(255, 255, 255, 0.35);
-      box-shadow: 0 24px 80px rgba(40, 35, 25, 0.045);
-      animation: enter 700ms ease-out both;
-    }
-
-    .topline {
-      position: absolute;
-      top: 24px;
-      left: 28px;
-      right: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .brand {
-      color: var(--ink);
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 1.6px;
-      text-transform: uppercase;
-    }
-
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 600;
-    }
-
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #a3a39a;
-    }
-
-    .symbol {
-      width: 76px;
-      height: 76px;
-      display: grid;
-      place-items: center;
-      margin-bottom: 30px;
-      border: 1px solid #f0d8ce;
-      border-radius: 24px;
-      background: #fff0e9;
-      color: var(--accent);
-      transform: rotate(-5deg);
-    }
-
-    .symbol svg {
-      width: 34px;
-      height: 34px;
-      transform: rotate(5deg);
-    }
-
-    .eyebrow {
-      margin-bottom: 18px;
-      color: var(--accent);
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      font-size: clamp(48px, 9vw, 82px);
-      font-weight: 800;
-      line-height: 0.98;
-      letter-spacing: -5px;
-    }
-
-    h1 span {
-      display: block;
-      margin-top: 8px;
-      color: var(--accent);
-      font-family: "Playfair Display", Georgia, serif;
-      font-weight: 500;
-      font-style: italic;
-      letter-spacing: -3px;
-    }
-
-    .message {
-      max-width: 360px;
-      margin-top: 26px;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.8;
-    }
-
-    .bottom {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      margin-top: 62px;
-      padding-top: 20px;
-      border-top: 1px solid var(--line);
-      text-align: right;
-    }
-
-    .signature {
-      color: var(--muted);
-      font-size: 12px;
-      white-space: nowrap;
-    }
-
-    .signature strong {
-      color: var(--ink);
-      font-weight: 800;
-    }
-
-    .heart {
-      display: inline-block;
-      color: var(--accent);
-      animation: pulse 1.8s ease-in-out infinite;
-    }
-
-    .decoration {
-      position: absolute;
-      z-index: -1;
-      color: #e8e1d7;
-      font-size: 20px;
-      user-select: none;
-      pointer-events: none;
-    }
-
-    .decoration.one {
-      top: 29%;
-      left: 9%;
-      transform: rotate(-15deg);
-    }
-
-    .decoration.two {
-      right: 9%;
-      bottom: 31%;
-      color: #f0c8b9;
-      transform: rotate(15deg);
-    }
-
-    @keyframes enter {
-      from {
-        opacity: 0;
-        transform: translateY(14px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.18); }
-    }
-
-    @media (max-width: 520px) {
-      .page {
-        min-height: 460px;
-        padding: 78px 22px 24px;
-        border-radius: 22px;
-      }
-
-      .topline {
-        top: 20px;
-        left: 20px;
-        right: 20px;
-      }
-
-      .brand {
-        font-size: 10px;
-        letter-spacing: 1px;
-      }
-
-      .status {
-        font-size: 10px;
-      }
-
-      h1 {
-        letter-spacing: -3px;
-      }
-
-      h1 span {
-        letter-spacing: -2px;
-      }
-
-      .message {
-        font-size: 13px;
-      }
-
-      .bottom {
-        margin-top: 48px;
-      }
-
-      .signature {
-        font-size: 11px;
-      }
-
-      .decoration.one {
-        left: 5%;
-      }
-
-      .decoration.two {
-        right: 5%;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation: none !important;
-      }
-    }
-  </style>
-</head>
-
-<body>
-  <main class="page">
-
-    <header class="topline">
-      <span class="brand">OH Coupon Checker</span>
-
-      <span class="status">
-        <span class="status-dot"></span>
-        End of service
-      </span>
-    </header>
-
-    <span class="decoration one" aria-hidden="true">✳</span>
-    <span class="decoration two" aria-hidden="true">✳</span>
-
-    <div class="symbol" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none"
-           stroke="currentColor" stroke-width="1.6"
-           stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 7v5h-5" />
-        <path d="M4 17v-5h5" />
-        <path d="M5.6 9A7 7 0 0 1 17.5 6L20 12" />
-        <path d="M18.4 15A7 7 0 0 1 6.5 18L4 12" />
-      </svg>
-    </div>
-
-    <p class="eyebrow">Mission accomplished</p>
-
-    <h1>
-      That's a
-      <span>wrap.</span>
-    </h1>
-
-    <p class="message">
-      This page has served its purpose.
-      Thanks for stopping by!
-    </p>
-
-    <footer class="bottom">
-      <span class="signature">
-        Made with <span class="heart">♥</span> by
-        <strong>Ashish</strong>
-      </span>
-    </footer>
-
-  </main>
-</body>
-</html>
-```
